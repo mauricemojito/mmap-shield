@@ -636,10 +636,7 @@ fn flock_exclusive_blocks() {
         .unwrap();
 
     // Second exclusive lock should fail with WouldBlock (LOCK_NB)
-    let result = SafeMmap::options()
-        .writable(true)
-        .flock(true)
-        .open(&path);
+    let result = SafeMmap::options().writable(true).flock(true).open(&path);
 
     assert!(result.is_err());
 }
