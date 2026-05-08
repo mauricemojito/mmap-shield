@@ -1,0 +1,23 @@
+[package]
+name = "mmap-shield"
+version = "0.1.0"
+edition = "2024"
+description = "SIGBUS-safe memory-mapped file access for network filesystems (NFS/EFS)"
+license = "MIT OR Apache-2.0"
+keywords = ["mmap", "sigbus", "nfs", "efs", "memory-mapped"]
+categories = ["filesystem", "os"]
+
+[dependencies]
+libc = "0.2"
+thiserror = "2"
+
+[dev-dependencies]
+tempfile = "3"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "mmap_bench"
+harness = false
+
+[build-dependencies]
+cc = "1"
