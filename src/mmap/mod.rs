@@ -983,6 +983,33 @@ impl SafeMmap {
         self.poisoned.load(Ordering::Relaxed)
     }
 
+    /// Resets the poison state and fault counter.
+    ///
+    /// After a network filesystem recovers, call this to allow
+    /// the mapping to accept reads again. The fault counter is
+    /// reset to zero and the poisoned flag is cleared.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mmap_shield::SafeMmap;
+    ///
+    /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mmap = SafeMmap::open("data.bin")?;
+    ///
+    /// // ... NFS dies, mapping gets poisoned ...
+    ///
+    /// // NFS recovers — reset and retry:
+    /// mmap.reset_poison();
+    /// let data = mmap.read(0..1024, |b| b.to_vec())?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn reset_poison(&self) {
+        self.poisoned.store(false, Ordering::Relaxed);
+        self.sigbus_count.store(0, Ordering::Relaxed);
+    }
+
     fn check_poisoned(&self) -> Result<(), AccessError> {
         if self.poisoned.load(Ordering::Relaxed) {
             return Err(AccessError::Poisoned {
